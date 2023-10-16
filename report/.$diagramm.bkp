@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2023-10-16T10:57:48.544Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.2 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" etag="yMh9UYThJpw8jkuC5xOQ" version="22.0.2" type="device" pages="2">
+<mxfile host="Electron" modified="2023-10-16T08:48:21.427Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.2 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" etag="cc1M55BaMJNwVkGotucy" version="22.0.2" type="device" pages="2">
   <diagram name="Page-1" id="74b105a0-9070-1c63-61bc-23e55f88626e">
-    <mxGraphModel dx="1626" dy="1133" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1.5" pageWidth="1169" pageHeight="826" background="none" math="0" shadow="0">
+    <mxGraphModel dx="1626" dy="1133" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1.5" pageWidth="1169" pageHeight="826" background="none" math="0" shadow="0">
       <root>
         <mxCell id="0" style=";html=1;" />
         <mxCell id="1" style=";html=1;" parent="0" />
@@ -303,7 +303,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="pTL7h-W5fQ8d1AlFOku-" name="Page-2">
-    <mxGraphModel dx="2182" dy="1363" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" background="none" math="0" shadow="0">
+    <mxGraphModel dx="2426" dy="1533" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" background="none" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -812,7 +812,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="ludLQCFc7VxHFMUh7fUK-1" value="&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;Order workflow(saga)&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;dashed=1;align=right;verticalAlign=top;" parent="1" vertex="1">
-          <mxGeometry x="261" y="-240" width="634" height="490" as="geometry" />
+          <mxGeometry x="261" y="-240" width="634" height="478" as="geometry" />
         </mxCell>
         <mxCell id="ludLQCFc7VxHFMUh7fUK-2" value="order_new" style="shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;html=1;fontSize=16;" parent="1" vertex="1">
           <mxGeometry x="345" y="-155" width="221" height="300" as="geometry">
@@ -1096,7 +1096,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="ludLQCFc7VxHFMUh7fUK-81" value="Warehouse service&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;dashed=1;align=right;verticalAlign=top;" parent="1" vertex="1">
-          <mxGeometry x="260" y="288" width="640" height="478" as="geometry" />
+          <mxGeometry x="255.5" y="288" width="645" height="478" as="geometry" />
         </mxCell>
         <mxCell id="ludLQCFc7VxHFMUh7fUK-82" value="items" style="shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;html=1;fontSize=16;" parent="1" vertex="1">
           <mxGeometry x="326.5" y="361" width="221" height="90" as="geometry">
