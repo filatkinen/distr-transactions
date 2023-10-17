@@ -1,42 +1,89 @@
 package kafka
 
 import (
+	"errors"
 	"github.com/IBM/sarama"
-	"log"
 	"log/slog"
+	"sync"
 )
 
 type Consumer struct {
-	consumer sarama.Consumer
-	log      *slog.Logger
-	topic    string
+	log    *slog.Logger
+	config *sarama.Config
+
+	connString string
+	topic      string
+
+	funcMessage func(*sarama.ConsumerMessage)
+
+	// called if Config.Consumer.Return.Errors = true
+	funcMessageError func(*sarama.ConsumerError)
+
+	consumer  sarama.Consumer
+	wg        sync.WaitGroup
+	closeChan chan struct{}
 }
 
-func NewConsumer(conf *sarama.Config, connString string, logger *slog.Logger, topic string, f func(*sarama.ConsumerMessage)) (*Consumer, error) {
-	consumer, err := sarama.NewConsumer([]string{connString}, conf)
+func NewConsumer(config *sarama.Config,
+	log *slog.Logger,
+	connString string,
+	topic string,
+	funcMessage func(*sarama.ConsumerMessage),
+	funcMessageError func(*sarama.ConsumerError)) (*Consumer, error) {
+
+	con, err := sarama.NewConsumer([]string{connString}, config)
 	if err != nil {
 		return nil, err
 	}
-	return &Consumer{consumer: consumer, log: logger}, nil
+	return &Consumer{
+		log:              log,
+		config:           config,
+		connString:       connString,
+		topic:            topic,
+		funcMessage:      funcMessage,
+		funcMessageError: funcMessageError,
+		consumer:         con,
+		closeChan:        make(chan struct{}),
+	}, nil
 }
 
-func (c *Consumer) Start() error {
-
+// offset=sarama.OffsetOldest or sarama.OffsetNewest
+func (c *Consumer) ConsumeMessage(offset int64) error {
+	partitionList, err := c.consumer.Partitions(c.topic)
+	if err != nil {
+		return err
+	}
+	counter := 0
+	for _, partition := range partitionList {
+		partitionConsumer, err := c.consumer.ConsumePartition(c.topic, partition, offset)
+		if err != nil {
+			c.log.Error("cannot get partitionConsumer:", partition, err)
+			continue
+		}
+		counter++
+		c.wg.Add(1)
+		go func(partitionConsumer sarama.PartitionConsumer) {
+			defer c.wg.Done()
+			for {
+				select {
+				case consumeError := <-partitionConsumer.Errors():
+					c.funcMessageError(consumeError)
+				case msg := <-partitionConsumer.Messages():
+					c.funcMessage(msg)
+				case <-c.closeChan:
+					return
+				}
+			}
+		}(partitionConsumer)
+	}
+	if counter == 0 {
+		return errors.New("Cannot start processing to any partition")
+	}
+	return nil
 }
 
 func (c *Consumer) Close() error {
+	close(c.closeChan)
+	c.wg.Wait()
 	return c.consumer.Close()
-}
-
-func (c *Consumer) Getmessage() {
-	consumer, _ := sarama.NewConsumer([]string{"localhost:9092"}, nil)
-	partitionList, _ := consumer.Partitions("test")
-	for _, partition := range partitionList {
-		pc, _ := consumer.ConsumePartition("test", partition, sarama.OffsetOldest)
-		go func(pc sarama.PartitionConsumer) {
-			for message := range pc.Messages() {
-				log.Printf("received message %v\n", string(message.Value))
-			}
-		}(pc)
-	}
 }
