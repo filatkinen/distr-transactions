@@ -10,7 +10,7 @@ type Producer struct {
 	log      *slog.Logger
 }
 
-func NewProducer(conf *sarama.Config, connString string, logger *slog.Logger) (*Producer, error) {
+func NewSyncProducer(conf *sarama.Config, connString string, logger *slog.Logger) (*Producer, error) {
 	producer, err := sarama.NewSyncProducer([]string{connString}, conf)
 	if err != nil {
 		return nil, err

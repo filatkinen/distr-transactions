@@ -31,6 +31,10 @@ func NewConsumer(config *sarama.Config,
 	funcMessage func(*sarama.ConsumerMessage),
 	funcMessageError func(*sarama.ConsumerError)) (*Consumer, error) {
 
+	if funcMessage == nil {
+		return nil, errors.New("nil func for messages")
+	}
+
 	con, err := sarama.NewConsumer([]string{connString}, config)
 	if err != nil {
 		return nil, err
@@ -48,7 +52,7 @@ func NewConsumer(config *sarama.Config,
 }
 
 // offset=sarama.OffsetOldest or sarama.OffsetNewest
-func (c *Consumer) ConsumeMessage(offset int64) error {
+func (c *Consumer) ConsumeMessageStart(offset int64) error {
 	partitionList, err := c.consumer.Partitions(c.topic)
 	if err != nil {
 		return err
@@ -67,7 +71,9 @@ func (c *Consumer) ConsumeMessage(offset int64) error {
 			for {
 				select {
 				case consumeError := <-partitionConsumer.Errors():
-					c.funcMessageError(consumeError)
+					if c.funcMessageError != nil {
+						c.funcMessageError(consumeError)
+					}
 				case msg := <-partitionConsumer.Messages():
 					c.funcMessage(msg)
 				case <-c.closeChan:
@@ -77,9 +83,15 @@ func (c *Consumer) ConsumeMessage(offset int64) error {
 		}(partitionConsumer)
 	}
 	if counter == 0 {
-		return errors.New("Cannot start processing to any partition")
+		return errors.New("cannot start processing to any partition")
 	}
 	return nil
+}
+
+func (c *Consumer) ConsumeMessageStop() {
+	close(c.closeChan)
+	c.wg.Wait()
+	c.closeChan = make(chan struct{})
 }
 
 func (c *Consumer) Close() error {
