@@ -3,12 +3,13 @@ package kafka
 import (
 	"errors"
 	"github.com/IBM/sarama"
+	"log"
 	"log/slog"
 	"sync"
 )
 
 type Consumer struct {
-	log    *slog.Logger
+	log    *log.Logger
 	config *sarama.Config
 
 	connString string
@@ -16,7 +17,7 @@ type Consumer struct {
 
 	funcMessage func(*sarama.ConsumerMessage)
 
-	// called if Config.Consumer.Return.Errors = true
+	// called if Config.consumerHandler.Return.Errors = true
 	funcMessageError func(*sarama.ConsumerError)
 
 	consumer  sarama.Consumer
@@ -24,10 +25,12 @@ type Consumer struct {
 	closeChan chan struct{}
 }
 
-func NewConsumer(config *sarama.Config,
-	log *slog.Logger,
+func NewConsumer(producerConfig func() *sarama.Config,
+	logHandler slog.Handler,
+	logVerbose bool,
 	connString string,
 	topic string,
+	clientID string,
 	funcMessage func(*sarama.ConsumerMessage),
 	funcMessageError func(*sarama.ConsumerError)) (*Consumer, error) {
 
@@ -35,12 +38,22 @@ func NewConsumer(config *sarama.Config,
 		return nil, errors.New("nil func for messages")
 	}
 
+	if logHandler == nil {
+		return nil, errors.New("empty slog.handler")
+	}
+	logger := slog.NewLogLogger(logHandler, slog.LevelInfo)
+	if logVerbose {
+		sarama.Logger = logger
+	}
+
+	config := producerConfig()
+	config.ClientID = clientID
 	con, err := sarama.NewConsumer([]string{connString}, config)
 	if err != nil {
 		return nil, err
 	}
 	return &Consumer{
-		log:              log,
+		log:              logger,
 		config:           config,
 		connString:       connString,
 		topic:            topic,
@@ -61,7 +74,7 @@ func (c *Consumer) ConsumeMessageStart(offset int64) error {
 	for _, partition := range partitionList {
 		partitionConsumer, err := c.consumer.ConsumePartition(c.topic, partition, offset)
 		if err != nil {
-			c.log.Error("cannot get partitionConsumer:", partition, err)
+			c.log.Printf("cannot get partitionConsumer:", partition, err)
 			continue
 		}
 		counter++

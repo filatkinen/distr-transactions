@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/IBM/sarama"
 	"github.com/filatkinen/distr-transactions/internal/kafka"
 	"log/slog"
@@ -11,17 +12,21 @@ import (
 )
 
 func main() {
-	topic := flag.String("topic", "one.topic", "topic to connect")
+	topic := flag.String("topic", "two.topic", "topic to connect")
 	connstring := flag.String("connstring", "localhost:9092", "kafka conn string")
 
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	logHandler := slog.NewJSONHandler(os.Stdout, nil)
+	logger := slog.New(logHandler)
 
-	config := sarama.NewConfig()
-	config.Consumer.Return.Errors = true
-	consumer, err := kafka.NewConsumer(config, logger, *connstring, *topic,
+	consumer, err := kafka.NewConsumer(func() *sarama.Config {
+		config := sarama.NewConfig()
+		config.Consumer.Return.Errors = true
+		return config
+	}, logHandler, true, *connstring, *topic, "kafka-client",
 		func(message *sarama.ConsumerMessage) {
-			logger.Info("got message",
+			fmt.Println(
 				slog.Int64("Offset", message.Offset),
+				slog.Int("Patrition", int(message.Partition)),
 				slog.String("topic", message.Topic),
 				slog.String("message", string(message.Value)))
 		}, nil)

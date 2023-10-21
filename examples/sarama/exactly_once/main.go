@@ -3,6 +3,7 @@ package main
 // SIGUSR1 toggle the pause/resume consumption
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -25,6 +26,7 @@ var (
 	destinationTopic = ""
 	oldest           = true
 	verbose          = false
+	assignor         = ""
 )
 
 func init() {

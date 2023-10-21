@@ -6,6 +6,7 @@ import (
 	"errors"
 	"flag"
 	"log"
+	"log/slog"
 	"os"
 	"os/signal"
 	"strings"
@@ -27,13 +28,13 @@ var (
 )
 
 func init() {
-	flag.StringVar(&brokers, "brokers", "", "Kafka bootstrap brokers to connect to, as a comma separated list")
-	flag.StringVar(&group, "group", "", "Kafka consumer group definition")
-	flag.StringVar(&version, "version", "2.1.1", "Kafka cluster version")
-	flag.StringVar(&topics, "topics", "", "Kafka topics to be consumed, as a comma separated list")
+	flag.StringVar(&brokers, "brokers", "localhost:9092", "Kafka bootstrap brokers to connect to, as a comma separated list")
+	flag.StringVar(&group, "group", "fore", "Kafka consumer group definition")
+	flag.StringVar(&version, "version", "3.5.1", "Kafka cluster version")
+	flag.StringVar(&topics, "topics", "two.topic", "Kafka topics to be consumed, as a comma separated list")
 	flag.StringVar(&assignor, "assignor", "range", "Consumer group partition assignment strategy (range, roundrobin, sticky)")
 	flag.BoolVar(&oldest, "oldest", true, "Kafka consumer consume initial offset from oldest")
-	flag.BoolVar(&verbose, "verbose", false, "Sarama logging")
+	flag.BoolVar(&verbose, "verbose", true, "Sarama logging")
 	flag.Parse()
 
 	if len(brokers) == 0 {
@@ -53,8 +54,11 @@ func main() {
 	keepRunning := true
 	log.Println("Starting a new Sarama consumer")
 
+	logHandler := slog.NewJSONHandler(os.Stdout, nil)
+	logger := slog.NewLogLogger(logHandler, slog.LevelInfo)
 	if verbose {
-		sarama.Logger = log.New(os.Stdout, "[sarama] ", log.LstdFlags)
+		//sarama.Logger = log.New(os.Stdout, "[sarama] ", log.LstdFlags)
+		sarama.Logger = logger
 	}
 
 	version, err := sarama.ParseKafkaVersion(version)
@@ -166,8 +170,9 @@ type Consumer struct {
 }
 
 // Setup is run at the beginning of a new session, before ConsumeClaim
-func (consumer *Consumer) Setup(sarama.ConsumerGroupSession) error {
+func (consumer *Consumer) Setup(session sarama.ConsumerGroupSession) error {
 	// Mark the consumer as ready
+	//session.ResetOffset("topics", 0, 10, "")
 	close(consumer.ready)
 	return nil
 }
@@ -192,7 +197,8 @@ func (consumer *Consumer) ConsumeClaim(session sarama.ConsumerGroupSession, clai
 				log.Printf("message channel was closed")
 				return nil
 			}
-			log.Printf("Message claimed: value = %s, timestamp = %v, topic = %s", string(message.Value), message.Timestamp, message.Topic)
+			log.Printf("Message claimed: value = %s, timestamp = %v, topic = %s, partition%d",
+				string(message.Value), message.Timestamp, message.Topic, message.Partition)
 			session.MarkMessage(message, "")
 		// Should return when `session.Context()` is done.
 		// If not, will raise `ErrRebalanceInProgress` or `read tcp <ip>:<port>: i/o timeout` when kafka rebalance. see:
