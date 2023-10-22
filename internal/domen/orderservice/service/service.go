@@ -44,6 +44,7 @@ func New(port string,
 		return nil, err
 	}
 	service.db = db
+	service.logger.Info("Successfully connecting to the database")
 
 	service.ProducerTopics = configP.Topics
 	producer, err := kafka.NewSyncProducer(func() *sarama.Config {
@@ -55,7 +56,7 @@ func New(port string,
 	},
 		configP.ConnString, service.logger.Handler(), configP.LogVerbose, configP.ClientID)
 	if err != nil {
-		return nil, errors.Join(err, service.db.Close())
+		return nil, errors.Join(err, service.closeDB())
 	}
 	service.Producer = producer
 
@@ -75,7 +76,7 @@ func New(port string,
 		service.KafkaGetError,
 	)
 	if err != nil {
-		return nil, errors.Join(err, service.db.Close(), service.Producer.Close())
+		return nil, errors.Join(err, service.closeDB(), service.Producer.Close())
 	}
 	service.Consumer = consumer
 
@@ -152,5 +153,10 @@ func (s *Service) Stop() error {
 }
 
 func (s *Service) Close() error {
-	return errors.Join(s.db.Close(), s.Producer.Close(), s.Consumer.Close())
+	return errors.Join(s.closeDB(), s.Producer.Close(), s.Consumer.Close())
+}
+
+func (s *Service) closeDB() error {
+	s.logger.Info("Closing Database...")
+	return s.db.Close()
 }
