@@ -1,0 +1,106 @@
+version: '3'
+
+services:
+
+  kafka01:
+    image: 'bitnami/kafka:3.5.1'
+    container_name: kafka01
+    environment:
+      # KRaft settings
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka01:9093,1@kafka02:9093
+      - KAFKA_KRAFT_CLUSTER_ID=abcdefghijklmnopqrstuv
+      # Listeners
+      - KAFKA_CFG_LISTENERS=INTERNAL://:9091,EXTERNAL://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://kafka01:9091,EXTERNAL://localhost:9092
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
+    ports:
+      - "9092:9092"
+    networks:
+      - local
+    volumes:
+      - 'kafka01_data:/bitnami/kafka'
+
+  kafka02:
+    image: 'bitnami/kafka:3.5.1'
+    container_name: kafka02
+    environment:
+      # KRaft settings
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka01:9093,1@kafka02:9093
+      - KAFKA_KRAFT_CLUSTER_ID=abcdefghijklmnopqrstuv
+      # Listeners
+      - KAFKA_CFG_LISTENERS=INTERNAL://:9091,EXTERNAL://:9192,CONTROLLER://:9093
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://kafka02:9091,EXTERNAL://localhost:9192
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
+    ports:
+      - "9192:9192"
+    networks:
+      - local
+    volumes:
+      - 'kafka02_data:/bitnami/kafka'
+
+  schema-registry:
+    image: 'bitnami/schema-registry:7.5'
+    container_name: schema-registry
+    ports:
+      - '8081:8081'
+    depends_on:
+      - kafka01
+      - kafka02
+    environment:
+      - SCHEMA_REGISTRY_LISTENERS=http://0.0.0.0:8081
+      - SCHEMA_REGISTRY_KAFKA_BROKERS=PLAINTEXT://kafka01:9091,PLAINTEXT://kafka02:9091
+    networks:
+      - local
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:v0.7.1
+    container_name: kafka_ui
+    depends_on:
+      - kafka01
+      - kafka02
+    ports:
+      - "8080:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS=kafka01:9091,kafka02:9091
+      - KAFKA_CLUSTERS_0_NAME=kraft
+    networks:
+      - local
+
+#
+#  init-kafka:
+#    image: confluentinc/cp-kafka:6.1.1
+#    container_name: kafka_init
+#    depends_on:
+#      - kafka
+#    entrypoint: [ '/bin/sh', '-c' ]
+#    networks:
+#      - local
+#    command: |
+#      "
+#      # blocks until kafka is reachable
+#      kafka-topics --bootstrap-server kafka01:9091 --list
+#      echo -e 'Creating kafka topics'
+#      kafka-topics --bootstrap-server kafka01:9091 --create --if-not-exists --topic one.topic --replication-factor 1 --partitions 1
+#
+#      echo -e 'Successfully created the following topics:'
+#      kafka-topics --bootstrap-server kafka01:9091 --list
+#      "
+
+
+
+volumes:
+  kafka01_data:
+    driver: local
+  kafka02_data:
+    driver: local
+
+networks:
+  local:

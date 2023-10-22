@@ -6,12 +6,18 @@ import (
 	"log"
 )
 
+type DBConfig struct {
+	ConnString string
+	MaxConn    int
+	MinConn    int
+}
+
 type Database struct {
 	db *pgxpool.Pool
 }
 
-func New(connString string, maxConn, minConn int) (*Database, error) {
-	db, err := newPool(connString, maxConn, minConn)
+func New(config DBConfig) (*Database, error) {
+	db, err := newPool(config)
 	if err != nil {
 		log.Printf("error creating pgxpool %s", err)
 		return nil, err
@@ -19,13 +25,13 @@ func New(connString string, maxConn, minConn int) (*Database, error) {
 	return &Database{db: db}, nil
 }
 
-func newPool(connString string, maxConn, minConn int) (*pgxpool.Pool, error) {
-	poolConfig, err := pgxpool.ParseConfig(connString)
+func newPool(config DBConfig) (*pgxpool.Pool, error) {
+	poolConfig, err := pgxpool.ParseConfig(config.ConnString)
 	if err != nil {
 		log.Fatalln("Unable to parse DATABASE_URL:", err)
 	}
-	poolConfig.MaxConns = int32(maxConn)
-	poolConfig.MinConns = int32(minConn)
+	poolConfig.MaxConns = int32(config.MaxConn)
+	poolConfig.MinConns = int32(config.MinConn)
 	db, err := pgxpool.NewWithConfig(context.Background(), poolConfig)
 
 	if err != nil {

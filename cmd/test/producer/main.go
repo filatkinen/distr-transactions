@@ -12,9 +12,9 @@ import (
 )
 
 func main() {
-	topic := flag.String("topic", "two.topic", "topic to connect")
+	topic := flag.String("topic", "one.topic", "topic to connect")
 	connstring := flag.String("connstring", "localhost:9092", "kafka conn string")
-	clientID := flag.String("clientID", "kakka-Client", "kafka clientID")
+	clientID := flag.String("clientID", "kafka-Client", "kafka clientID")
 	//func NewSyncProducer(config func() *sarama.Config, connString string, logHandler slog.Handler, logVerbose bool) (*ProducerSync, error) {
 
 	logHandler := slog.NewJSONHandler(os.Stdout, nil)
