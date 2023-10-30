@@ -16,11 +16,29 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
-DROP INDEX public.payment_order_id_user_id_index;
-ALTER TABLE ONLY public.payment DROP CONSTRAINT payment_pk;
-ALTER TABLE public.payment ALTER COLUMN payment_id DROP DEFAULT;
-DROP SEQUENCE public.payment_payment_id_seq;
-DROP TABLE public.payment;
+DROP DATABASE IF EXISTS shop_payment_service;
+--
+-- Name: shop_payment_service; Type: DATABASE; Schema: -; Owner: shop_payment_service_user
+--
+
+CREATE DATABASE shop_payment_service WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'C';
+
+
+ALTER DATABASE shop_payment_service OWNER TO shop_payment_service_user;
+
+\connect shop_payment_service
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -74,6 +92,8 @@ ALTER TABLE ONLY public.payment ALTER COLUMN payment_id SET DEFAULT nextval('pub
 -- Data for Name: payment; Type: TABLE DATA; Schema: public; Owner: shop_payment_service_user
 --
 
+COPY public.payment (payment_id, order_id, payment_type, payment_at, sum, status, user_id) FROM stdin;
+\.
 
 
 --

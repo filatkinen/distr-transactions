@@ -16,15 +16,29 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
-ALTER TABLE ONLY public.invoice_items DROP CONSTRAINT invoice_items_invoice_invoice_id_fk;
-DROP INDEX public.items_item_id_uindex;
-ALTER TABLE ONLY public.invoice DROP CONSTRAINT invoice_pk;
-ALTER TABLE ONLY public.invoice_items DROP CONSTRAINT invoice_items_pk;
-ALTER TABLE public.invoice ALTER COLUMN invoice_id DROP DEFAULT;
-DROP TABLE public.items;
-DROP TABLE public.invoice_items;
-DROP SEQUENCE public.invoice_invoice_id_seq;
-DROP TABLE public.invoice;
+DROP DATABASE IF EXISTS shop_warehouse_service;
+--
+-- Name: shop_warehouse_service; Type: DATABASE; Schema: -; Owner: shop_warehouse_service_user
+--
+
+CREATE DATABASE shop_warehouse_service WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'C';
+
+
+ALTER DATABASE shop_warehouse_service OWNER TO shop_warehouse_service_user;
+
+\connect shop_warehouse_service
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -100,18 +114,24 @@ ALTER TABLE ONLY public.invoice ALTER COLUMN invoice_id SET DEFAULT nextval('pub
 -- Data for Name: invoice; Type: TABLE DATA; Schema: public; Owner: shop_warehouse_service_user
 --
 
+COPY public.invoice (invoice_id, invoice_at, invoice_type, invoice_requisite) FROM stdin;
+\.
 
 
 --
 -- Data for Name: invoice_items; Type: TABLE DATA; Schema: public; Owner: shop_warehouse_service_user
 --
 
+COPY public.invoice_items (invoice_id, item_id, item_quantity) FROM stdin;
+\.
 
 
 --
 -- Data for Name: items; Type: TABLE DATA; Schema: public; Owner: shop_warehouse_service_user
 --
 
+COPY public.items (item_id, quantity) FROM stdin;
+\.
 
 
 --
