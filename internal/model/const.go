@@ -21,3 +21,33 @@ const (
 	ServiceIDPayment      ServiceID = 2
 	ServiceIDNotification ServiceID = 3
 )
+
+func (s OrderStatus) String() string {
+	str := ""
+	switch s {
+	case OrderStatusNotOk:
+		str = "NOT OK"
+	case OrderStatusOk:
+		str = "OK"
+	case OrderStatusProcess:
+		str = "Process"
+	case OrderStatusNew:
+		str = "New"
+	case OrderStatusCancel:
+		str = "Canceled"
+	}
+	return str
+}
+
+func (s ServiceStatus) String() string {
+	str := ""
+	switch s {
+	case ServiceStatusAk:
+		str = "Accepted"
+	case ServiceStatusNotOK:
+		str = "NOT OK"
+	case ServiceStatusOK:
+		str = "OK"
+	}
+	return str
+}

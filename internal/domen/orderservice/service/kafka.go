@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/IBM/sarama"
 	"github.com/filatkinen/distr-transactions/internal/model"
+	"log/slog"
 )
 
 func (s *Service) KafkaGetMessage(message *sarama.ConsumerMessage) {
@@ -22,6 +23,8 @@ func (s *Service) KafkaGetMessage(message *sarama.ConsumerMessage) {
 			s.logger.Error("Updating  status", "err", err)
 			return
 		}
+		s.logger.Info("Getting result of processing", "Order ID", status.OrderID,
+			slog.String("result", status.Status.String()))
 	default:
 		fmt.Printf("Message claimed: value = %s, topic = %s, partition%d, offset:%d\n",
 			string(message.Value), message.Topic, message.Partition, message.Offset)

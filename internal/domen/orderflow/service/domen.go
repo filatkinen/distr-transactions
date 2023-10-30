@@ -126,7 +126,7 @@ func (s *Service) domenOrderFinishFlow(ctx context.Context, orderID uint32, resu
 		s.logger.Error("Error sending final message to order service", "err", err, "step marshaling", 2)
 		return err
 	}
-	_, _, err = s.Producer.SendBytes(model.TopicOrderNotification, b)
+	_, _, err = s.Producer.SendBytes(model.TopicOrderStatus, b)
 	if err != nil {
 		s.logger.Error("Error sending final message to order service", "err", err, "step sending Kafka", 3)
 		return err

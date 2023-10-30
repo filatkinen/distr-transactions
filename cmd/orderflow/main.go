@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/filatkinen/distr-transactions/internal/domen"
-	"github.com/filatkinen/distr-transactions/internal/domen/orderservice/service"
+	"github.com/filatkinen/distr-transactions/internal/domen/orderflow/service"
 	"github.com/filatkinen/distr-transactions/internal/model"
 	"github.com/filatkinen/distr-transactions/internal/storage"
 	"github.com/joho/godotenv"

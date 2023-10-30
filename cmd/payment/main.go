@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/filatkinen/distr-transactions/internal/domen"
-	"github.com/filatkinen/distr-transactions/internal/domen/warehouse/service"
+	"github.com/filatkinen/distr-transactions/internal/domen/payment/service"
 	"github.com/filatkinen/distr-transactions/internal/model"
 	"github.com/filatkinen/distr-transactions/internal/storage"
 	"github.com/joho/godotenv"
@@ -17,7 +17,7 @@ import (
 
 func main() {
 
-	err := godotenv.Load("warehouse.env")
+	err := godotenv.Load("payment.env")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -42,8 +42,7 @@ func main() {
 		LogVerbose: false,
 	}, domen.ConsumerConfig{
 		Topics: strings.Join([]string{
-			model.TopicOrderWareHouse,
-			model.TopicOrderWareHouseCancel},
+			model.TopicOrderPayment},
 			","),
 		ConnString: connstring,
 		ClientID:   clientID,

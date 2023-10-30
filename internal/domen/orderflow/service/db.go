@@ -17,10 +17,10 @@ func (s *Service) dbOrderAdd(ctx context.Context, order model.Order) (orderID ui
 		return fail(err)
 	}
 
-	query := `INSERT INTO orders (order_id, user_id, notification_type, created_at, approved_at, sum, status, order_items)
+	query := `INSERT INTO order_new (order_id, user_id, notification_type, created_at, approved_at, sum, status, order_items)
 				VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`
 	_, err = s.storage.DB.Exec(ctx, query, order.OrderID, order.UserID, order.Notification,
-		order.CreatedAt, order.ApprovedAt, order.Sum, b)
+		order.CreatedAt, order.ApprovedAt, order.Sum, order.Status, b)
 	if err != nil {
 		return fail(err)
 	}

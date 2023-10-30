@@ -16,7 +16,7 @@ func (s *Service) getroute() http.Handler {
 }
 
 func (s *Service) GetRoot(w http.ResponseWriter, _ *http.Request) {
-	w.Write([]byte("WareHouse service Ok\n"))
+	w.Write([]byte("OrderPayment service Ok\n"))
 }
 
 func (s *Service) Set(w http.ResponseWriter, r *http.Request) {

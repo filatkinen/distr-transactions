@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/filatkinen/distr-transactions/internal/model"
+	"log/slog"
 	"math/rand"
 	"time"
 )
@@ -36,7 +37,8 @@ func (s *Service) workerStartJobReserv(ctx context.Context, whMessage model.Ware
 		s.logger.Error("Error sending  message after reserv to send to orderflow ", "err", err)
 		return
 	}
-	s.logger.Info("Finish worker to reserv items", "Order ID", whMessage.OrderID)
+	s.logger.Info("Finish worker to reserv items", "Order ID", whMessage.OrderID,
+		slog.String("result", result.Status.String()))
 
 }
 
@@ -54,16 +56,17 @@ func (s *Service) workerStartJobReservCancel(ctx context.Context, whMessage mode
 	result.StatusAt = time.Now().UTC().Truncate(time.Millisecond)
 	result.Detail = "Reserv canceled"
 
-	b, err := json.Marshal(result)
-	if err != nil {
-		s.logger.Error("Error marshaling message after reserv cancel to send to orderflow ", "err", err)
-		return
-	}
-	_, _, err = s.Producer.SendBytes(model.TopicOrderWareHouseStatus, b)
-	if err != nil {
-		s.logger.Error("Error sending  message after reserv cancel to send to orderflow ", "err", err)
-		return
-	}
-	s.logger.Info("Finish worker to cancel reserv items", "Order ID", whMessage.OrderID)
+	//b, err := json.Marshal(result)
+	//if err != nil {
+	//	s.logger.Error("Error marshaling message after reserv cancel to send to orderflow ", "err", err)
+	//	return
+	//}
+	//_, _, err = s.Producer.SendBytes(model.TopicOrderWareHouseStatus, b)
+	//if err != nil {
+	//	s.logger.Error("Error sending  message after reserv cancel to send to orderflow ", "err", err)
+	//	return
+	//}
+	s.logger.Info("Finish worker to cancel reserv items", "Order ID", whMessage.OrderID,
+		slog.String("result", result.Status.String()))
 
 }

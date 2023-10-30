@@ -17,7 +17,7 @@ func (s *Service) getroute() http.Handler {
 }
 
 func (s *Service) GetRoot(w http.ResponseWriter, _ *http.Request) {
-	w.Write([]byte("Ok\n"))
+	w.Write([]byte("Order service Ok\n"))
 }
 
 func (s *Service) NewOrderHandler(w http.ResponseWriter, r *http.Request) {
@@ -35,6 +35,6 @@ func (s *Service) NewOrderHandler(w http.ResponseWriter, r *http.Request) {
 		httpcommon.ServerError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-
+	s.logger.Info("Adding new order to flow", "Order ID", orderInfo.OrderID)
 	httpcommon.WriteHTTPJsonOKIdent(w, orderInfo)
 }

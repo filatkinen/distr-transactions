@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 	"github.com/filatkinen/distr-transactions/internal/model"
 )
 
@@ -12,10 +11,7 @@ func (s *Service) orderDBNew(ctx context.Context, order model.Order) (orderID ui
 		return 0, err
 	}
 	defer func() {
-		if e := tx.Rollback(ctx); e != nil {
-			err := errors.Join(err, e)
-			s.logger.Info("error commiting", "err", err)
-		}
+		tx.Rollback(ctx)
 	}()
 
 	query := `INSERT INTO orders (user_id, notification_type, created_at, approved_at, sum, status)
@@ -24,7 +20,6 @@ func (s *Service) orderDBNew(ctx context.Context, order model.Order) (orderID ui
 	err = tx.QueryRow(ctx, query, order.UserID, order.Notification, order.Sum, model.OrderStatusNew).
 		Scan(&orderID)
 	if err != nil {
-		err = tx.Rollback(ctx)
 		return 0, err
 	}
 
@@ -34,7 +29,6 @@ func (s *Service) orderDBNew(ctx context.Context, order model.Order) (orderID ui
 		tag, err := tx.Exec(ctx, query, orderID, v.ItemID, v.Quantity, v.Price)
 		_ = tag
 		if err != nil {
-			err = tx.Rollback(ctx)
 			return 0, err
 		}
 	}
@@ -47,7 +41,7 @@ func (s *Service) orderDBNew(ctx context.Context, order model.Order) (orderID ui
 }
 
 func (s *Service) orderDBSetStatus(ctx context.Context, status model.OrderNotification) (err error) {
-	query := `UPDATE orders SET status=$1, detail=$2 WHERE order_id=$3`
+	query := `UPDATE orders SET status=$1, detail=$2, approved_at=NOW() WHERE order_id=$3`
 	rows, err := s.storage.DB.Query(ctx, query, status.Status, status.Detail, status.OrderID)
 	if err != nil {
 		return err

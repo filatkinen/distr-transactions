@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/filatkinen/distr-transactions/internal/model"
+	"strings"
 )
 
 type OrderItem struct {
@@ -28,6 +30,11 @@ func main() {
 
 	k := a1()
 	fmt.Println(k)
+
+	s1 := strings.Join([]string{
+		model.TopicOrderPayment},
+		",")
+	fmt.Println(s1)
 }
 
 func a1() a {
