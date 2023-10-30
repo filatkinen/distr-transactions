@@ -20,8 +20,4 @@ const (
 	ServiceIDWarehouse    ServiceID = 1
 	ServiceIDPayment      ServiceID = 2
 	ServiceIDNotification ServiceID = 3
-
-	InvoiceTypeIn      InvoiceType = 1
-	InvoiceTypeOut     InvoiceType = 2
-	InvoiceTypeRetract InvoiceType = 3
 )

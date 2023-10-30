@@ -28,6 +28,7 @@ type Service struct {
 	ConsumerTopics string
 	Mistakes       int
 	lock           sync.Mutex
+	wg             sync.WaitGroup
 }
 
 func New(port string,
@@ -95,10 +96,9 @@ func (s *Service) Start() error {
 
 	var errorHTTP, errorConsumer error
 
-	wg := sync.WaitGroup{}
-	wg.Add(1)
+	s.wg.Add(1)
 	go func() {
-		defer wg.Done()
+		defer s.wg.Done()
 		s.logger.Info("Starting Consumer")
 		errorConsumer = s.Consumer.MessageConsumeStart()
 		if errorConsumer != nil {
@@ -108,9 +108,9 @@ func (s *Service) Start() error {
 		close(sigStopConsuming)
 	}()
 
-	wg.Add(1)
+	s.wg.Add(1)
 	go func() {
-		defer wg.Done()
+		defer s.wg.Done()
 		s.logger.Info("Starting HTTP Server")
 		errorHTTP = s.srv.ListenAndServe()
 		if !errors.Is(errorHTTP, http.ErrServerClosed) {
@@ -136,7 +136,7 @@ func (s *Service) Start() error {
 			}
 		}
 	}
-	wg.Wait()
+	s.wg.Wait()
 
 	return errors.Join(errorConsumer, errorHTTP)
 }
