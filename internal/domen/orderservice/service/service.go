@@ -15,7 +15,7 @@ import (
 )
 
 type Service struct {
-	db             *storage.Database
+	storage        *storage.Database
 	srv            *http.Server
 	Consumer       *kafka.ConsumerGroup
 	Producer       *kafka.ProducerSync
@@ -43,7 +43,7 @@ func New(port string,
 	if err != nil {
 		return nil, err
 	}
-	service.db = db
+	service.storage = db
 	service.logger.Info("Successfully connecting to the database")
 
 	service.ProducerTopics = configP.Topics
@@ -158,5 +158,5 @@ func (s *Service) Close() error {
 
 func (s *Service) closeDB() error {
 	s.logger.Info("Closing Database...")
-	return s.db.Close()
+	return s.storage.Close()
 }

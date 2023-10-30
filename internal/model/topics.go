@@ -5,6 +5,7 @@ const (
 	TopicOrderStatus = "orders.service.status"
 
 	TopicOrderWareHouse       = "orders.service.warehouse.reserv"
+	TopicOrderWareHouseCancel = "orders.service.warehouse.cancel"
 	TopicOrderWareHouseStatus = "orders.service.warehouse.status"
 
 	TopicOrderPayment       = "orders.service.payment.pay"

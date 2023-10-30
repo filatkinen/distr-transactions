@@ -13,7 +13,7 @@ type DBConfig struct {
 }
 
 type Database struct {
-	db *pgxpool.Pool
+	DB *pgxpool.Pool
 }
 
 func New(config DBConfig) (*Database, error) {
@@ -22,7 +22,7 @@ func New(config DBConfig) (*Database, error) {
 		log.Printf("error creating pgxpool %s", err)
 		return nil, err
 	}
-	return &Database{db: db}, nil
+	return &Database{DB: db}, nil
 }
 
 func newPool(config DBConfig) (*pgxpool.Pool, error) {
@@ -47,7 +47,7 @@ func newPool(config DBConfig) (*pgxpool.Pool, error) {
 }
 
 func (d *Database) Close() error {
-	d.db.Close()
+	d.DB.Close()
 	return nil
 }
 
@@ -60,7 +60,7 @@ func (d *Database) Close() error {
 //
 //
 //	var numberUsers int
-//	err = d.db.QueryRow(context.Background(), `select count(username) from users`).Scan(&numberUsers)
+//	err = d.DB.QueryRow(context.Background(), `select count(username) from users`).Scan(&numberUsers)
 //	if err != nil {
 //		return "", err
 //	}
@@ -73,7 +73,7 @@ func (d *Database) Close() error {
 //	userOffset := r1.Intn(numberUsers)
 //
 //	query := `select username from users OFFSET $1 limit 1`
-//	err = d.db.QueryRow(context.Background(), query, userOffset).Scan(&username)
+//	err = d.DB.QueryRow(context.Background(), query, userOffset).Scan(&username)
 //	if err != nil {
 //		return "", err
 //	}

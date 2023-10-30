@@ -55,7 +55,7 @@ services:
       - kafka01
       - kafka02
     environment:
-      - SCHEMA_REGISTRY_LISTENERS=http://0.0.0.0:8081
+      - SCHEMA_REGISTRY_LISTENERS=httpcommon://0.0.0.0:8081
       - SCHEMA_REGISTRY_KAFKA_BROKERS=PLAINTEXT://kafka01:9091,PLAINTEXT://kafka02:9091
     networks:
       - local
