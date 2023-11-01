@@ -1,2 +1,0 @@
-https://github.com/ansakharov/golang-transactional-outbox-example
-
