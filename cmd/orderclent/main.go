@@ -36,7 +36,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	resp, err := http.Post("http://localhost:8180/neworder", "application/json",
+	fmt.Println(string(body))
+	resp, err := http.Post("http://localhost:8281/neworder", "application/json",
 		bytes.NewBuffer(body))
 	if err != nil {
 		log.Fatal(err, "error resp")
@@ -50,13 +51,4 @@ func main() {
 		return
 	}
 	fmt.Println(buf.String())
-	//var status model.OrderNotification
-	//dec := json.NewDecoder(resp.Body)
-	//err = dec.Decode(&status)
-	//if err != nil {
-	//	log.Println(err, "err decode")
-	//	return
-	//}
-	//fmt.Println(status)
-
 }
